@@ -77,7 +77,7 @@ web_modules/
 # Next.js build output
 .next
 out
-.secrets
+.secrets/
 
 # Nuxt.js build / generate output
 .nuxt
@@ -95,6 +95,9 @@ dist
 # vuepress v2.x temp and cache directory
 .temp
 .cache
+.DS_Store
+secrets/
+certs
 
 # Sveltekit cache directory
 .svelte-kit/

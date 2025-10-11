@@ -1,0 +1,10 @@
+{
+	"recommendations": [
+		"dbaeumer.vscode-eslint",
+		"eamodio.gitlens",
+		"streetsidesoftware.code-spell-checker",
+		"bierner.markdown-mermaid",
+		"MylesMurphy.prettify-ts",
+		"mikestead.dotenv"
+	]
+}
