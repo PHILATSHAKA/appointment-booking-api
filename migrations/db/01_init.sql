@@ -30,7 +30,7 @@ CREATE TYPE provinces AS ENUM (
 -- =====================================================
 -- Branches Table
 -- =====================================================
-CREATE TABLE branches (
+CREATE TABLE IF NOT EXISTS branches (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     name TEXT NOT NULL,
     address TEXT NOT NULL,
@@ -46,7 +46,7 @@ CREATE INDEX idx_branches_province ON branches (province);
 -- =====================================================
 -- Slots Table
 -- =====================================================
-CREATE TABLE slots (
+CREATE TABLE IF NOT EXISTS slots (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     branch_id UUID NOT NULL REFERENCES branches (id) ON DELETE CASCADE,
     start_time TIMESTAMPTZ NOT NULL,
@@ -72,7 +72,7 @@ CREATE TYPE booking_status AS ENUM ('CONFIRMED', 'CANCELLED', 'COMPLETED', 'EXPI
 -- =====================================================
 -- Bookings Table
 -- =====================================================
-CREATE TABLE bookings (
+CREATE TABLE IF NOT EXISTS bookings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     slot_id UUID NOT NULL REFERENCES slots (id) ON DELETE CASCADE,
     customer_email TEXT NOT NULL,

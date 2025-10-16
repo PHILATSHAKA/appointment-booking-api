@@ -1,6 +1,7 @@
 import { baseLogger } from '#src/utils/logger.js';
 import { basename } from 'path';
 import { dbConnectionPool } from '#resources/infra/config.js';
+import { env } from '#framework/configuration.js';
 
 const logger = baseLogger.child({ fileName: basename(import.meta.url), functionName: expireBookingsJob.name });
 
@@ -13,7 +14,7 @@ const logger = baseLogger.child({ fileName: basename(import.meta.url), functionN
  *  - Simulates an event to Kafka so dependent systems (e.g., admin dashboards) are notified.
  *
  */
-async function expireBookingsJob() {
+export async function expireBookingsJob() {
 
 	logger.warn(`[expireBookingsJob] Started at ${new Date().toISOString()}`);
 
@@ -66,10 +67,8 @@ async function expireBookingsJob() {
  * Uses `setInterval` to run the job every 5 minutes.
  * This is suitable for this MVP, but can later be replaced with a Kubernetes CronJob for more reliability.
  *
- * @example
- * startExpireBookingsWorker(); // schedules expiration job to run every 5 minutes
  */
 export function startExpireBookingsWorker() {
 	// Run every 5 minutes (300,000 ms)
-	setInterval(expireBookingsJob, 5 * 60 * 1000);
+	setInterval(expireBookingsJob, env.EXPIRE_BOOKINGS_INTERVAL_MS);
 }

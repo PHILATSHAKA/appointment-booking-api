@@ -6,11 +6,6 @@ import { z } from 'zod';
 // Define the schema for the environment variables which are required by the application to function.
 // Avoid being too stringent with validation, e.g. too stringent with an expected format.
 
-const stringToArraySchema = z
-	.string()
-	.nullish()
-	.transform((value) => (value ? value.split(',').map((str) => str.trim()) : []));
-
 export const environmentVariablesSchema = z.object({
 	// Application
 	ENV: z
@@ -38,38 +33,20 @@ export const environmentVariablesSchema = z.object({
 		.regex(/^(true|false)$/)
 		.optional(),
 	CORS_ALLOWED_ORIGINS: z.string().optional(),
-	USE_HELMET: z.string().optional(),
 
-	// Client
-	TRUSTED_CLIENT_ISSUER: z.string(),
-	TRUSTED_CLIENT_JWKS_URI: z.string(),
-	TRUSTED_CLIENT_ALLOWED_AUDIENCES: z.string().transform((value) => value.split('|')),
+	// Jobs
+	EXPIRE_BOOKINGS_CRON: z.string().min(1).optional(),
 
-	// Service Account
-	SA_AUTHORITY: z.string(),
-	SA_CLIENT_ID: z.string(),
-	SA_SCOPE: z.string(),
-
-	// OpenFGA
-	OPENFGA_API_URL: z.string(),
-
-	// Pulse Permission Model
-	MP_PERMISSIONS_STORE_ID: z.string(),
-	MP_PERMISSIONS_AUTHORIZATION_MODEL_ID: z.string(),
-
-	// Pulse Audit API
-	AUDIT_BASE_API_URL: z.string().url(),
+	EXPIRE_BOOKINGS_INTERVAL_MS: z.string().min(1).transform((value) => Number(value)),
 
 	// POSTGRESQL
-	POSTGRESQL_WRITER_HOST: z.string(),
-	POSTGRESQL_READER_HOST: z.string(),
-	POSTGRESQL_PORT: z.string().transform((value) => Number(value)),
+	POSTGRESQL_HOST: z.string().min(1),
+	POSTGRESQL_PORT: z.string().regex(/^\d{1,5}$/).transform((value) => Number(value)),
 	POSTGRESQL_CONNECTION_LIMIT: z.string().transform((value) => Number(value)),
 	POSTGRESQL_ALLOW_EXIT_ON_IDLE: z.string().regex(/^(true|false)$/).transform((value) => Boolean(value)),
-	POSTGRESQL_DATABASE: z.string(),
-	POSTGRESQL_USER: z.string(),
-	DELETE_USER_PROFILE: stringToArraySchema,
-	MANAGE_ROLES: stringToArraySchema
+	POSTGRESQL_DATABASE: z.string().min(4),
+	POSTGRESQL_USER: z.string().min(1),
+	POSTGRES_PASSWORD: z.string().min(1)
 });
 
 // Export the type of the environment variables so that it can be referenced throughout the application.

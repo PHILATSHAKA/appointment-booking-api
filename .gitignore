@@ -98,7 +98,7 @@ dist
 .DS_Store
 secrets/
 certs
-
+tests
 # Sveltekit cache directory
 .svelte-kit/
 

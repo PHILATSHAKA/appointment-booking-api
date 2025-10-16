@@ -1,16 +1,20 @@
-import { bookingStatus } from './updateBooking.js';
+import { bookingStatus } from '#src/common/schemas/bookingStatus.schema.js';
 import { dbConnectionPool } from '#resources/infra/config.js';
 import { z } from 'zod';
 
 export const getBookingByIdSchemaResponse = z.object({
-	bookingId: z.string(),
-	slotId: z.string(),
+	bookingId: z.string().uuid(),
+	slotId: z.string().uuid(),
+	slotStartTime: z.date(),
+	slotEndTime: z.date(),
 	customerEmail: z.string(),
 	customerName: z.string(),
 	serviceType: z.string(),
 	status: bookingStatus,
-	createdAt: z.string(),
-	updatedAt: z.string(),
+	createdAt: z.date(),
+	updatedAt: z.date(),
+	branchId: z.string().uuid(),
+	branchName: z.string(),
 	meta: z.record(z.unknown(), z.string().or(z.boolean().nullish().transform((value) => value ?? undefined)))
 });
 
@@ -38,17 +42,23 @@ export async function getBooking(bookingId: string) {
 		name: 'get_booking',
 		text: `
 			SELECT
-			b.id AS "bookingId",
-			b.slot_id AS "slotId",
-			b.customer_email AS "customerEmail",
-			b.customer_name AS "customerName",
-			b.service_type AS "serviceType",
-			b.meta,
-			b.status,
-			b.created_at AS "createdAt",
-			b.updated_at AS "updateAt"
+				b.id AS "bookingId",
+				b.slot_id AS "slotId",
+				b.customer_email AS "customerEmail",
+				b.customer_name AS "customerName",
+				b.service_type AS "serviceType",
+				b.meta,
+				b.status,
+				b.created_at AS "createdAt",
+				b.updated_at AS "updatedAt",
+				s.start_time AS "slotStartTime",
+				s.end_time AS "slotEndTime",
+				br.id AS "branchId",
+				br.name AS "branchName"
 			FROM bookings b
-			WHERE id=$1
+				JOIN slots s ON b.slot_id = s.id
+				JOIN branches br ON br.id = s.branch_id
+			WHERE b.id=$1
 		`,
 		values: [bookingId]
 

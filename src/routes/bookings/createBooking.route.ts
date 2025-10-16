@@ -6,12 +6,13 @@ import { z } from 'zod';
 
 import { createBooking, createBookingSchema } from '#services/bookings/createBooking.js';
 
+import { CUSTOMER_ACTIVE_BOOKING, SLOT_ALREADY_BOOKED, systemConflictMessageSchema } from '#errors/system/systemErrorCodes.js';
 import { authenticatedFrameworkResponses } from '#framework/types.js';
 
 const logger = baseLogger.child({ fileName: basename(import.meta.url), functionName: createBookingRoute.name });
 
 /**
- * Create booking.
+ * Create booking route.
  * @param server Fastify server instance.
  */
 export default function createBookingRoute(server: FastifyZodTypeProvider) {
@@ -31,7 +32,8 @@ export default function createBookingRoute(server: FastifyZodTypeProvider) {
 				201: z
 					.object({
 						bookingId: z.string()
-					})
+					}),
+				409: systemConflictMessageSchema
 			}
 		},
 		handler: async (request, reply) => {
@@ -50,7 +52,12 @@ export default function createBookingRoute(server: FastifyZodTypeProvider) {
 				logger.error({ error: error });
 
 				if (error instanceof AppError && error.statusCode === 409) {
-					return reply.status(409).send();
+
+					if (error.details && error.details.constraint === 'unique_active_booking_per_email') {
+						return reply.status(409).send(CUSTOMER_ACTIVE_BOOKING);
+					}
+
+					return reply.status(409).send(SLOT_ALREADY_BOOKED);
 				}
 
 				return reply.status(500).send();

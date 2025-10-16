@@ -25,11 +25,15 @@
 		"formbody",
 		"GAUTENG",
 		"healthcheck",
+		"initdb",
 		"instana",
+		"isready",
 		"jwks",
+		"kafkajs",
 		"KWAZULU",
 		"Luhn",
 		"MPUMALANGA",
+		"nodemon",
 		"normalise",
 		"normalised",
 		"openapi",
@@ -39,6 +43,7 @@
 		"prelocal",
 		"servicename",
 		"serviceversion",
+		"timestamptz",
 		"Tshaka"
 	],
 	"enabled": true

@@ -29,7 +29,7 @@ export const getBranchSlotsSchema = z.object({
 type GetBranchSlotsSchema = z.infer<typeof getBranchSlotsSchema>
 
 /**
- * Retrieve all slots for a given branch on a specific date, 
+ * Retrieve all slots for a given branch on a specific date,
  * including availability information.
  *
  * A slot is considered "available" if:
@@ -39,13 +39,7 @@ type GetBranchSlotsSchema = z.infer<typeof getBranchSlotsSchema>
  * @param {string} branchId - UUID of the branch to fetch slots for.
  * @param {string} date - The date (YYYY-MM-DD) to fetch slots for.
  *
- * @returns {Promise<Array<{
- *   id: string,
- *   branch_id: string,
- *   start_time: string,
- *   end_time: string,
- *   is_available: boolean
- * }>>} - Resolves with an array of slots for that branch and date.
+ * @returns {Promise<Array<GetBranchSlotsSchema>>} - Resolves with an array of slots for that branch and date.
  *
  * @throws {Error} Logs and rethrows if database query fails.
  */
@@ -58,53 +52,36 @@ export async function getBranchSlots(branchId: string, date: DateSchema) {
 		const { rows } = await dbConnectionPool.query<GetBranchSlotsSchema>({
 			name: 'get_branch_slots_sa',
 			text: `
-				SELECT
+				SELECT 
 					s.id,
 					s.branch_id AS "branchId",
-
 					-- UTC values (timestamptz stored in DB, returned to JS as Date objects)
 					s.start_time AS "startTimeUtc",
-					s.end_time   AS "endTimeUtc",
-
+					s.end_time  AS "endTimeUtc",
 					-- Local values formatted as strict ISO8601 string with fixed +02:00 offset
 					-- Converts from UTC to Africa/Johannesburg and formats as text
-					TO_CHAR(
-					s.start_time AT TIME ZONE 'Africa/Johannesburg',
-					'YYYY-MM-DD"T"HH24:MI:SS"+02:00"'
-					) AS "startTimeLocal",
-					TO_CHAR(
-					s.end_time AT TIME ZONE 'Africa/Johannesburg',
-					'YYYY-MM-DD"T"HH24:MI:SS"+02:00"'
-					) AS "endTimeLocal",
-
+					TO_CHAR(s.start_time AT TIME ZONE 'Africa/Johannesburg',
+					'YYYY-MM-DD"T"HH24:MI:SS"+02:00"') AS "startTimeLocal",
+					TO_CHAR(s.end_time AT TIME ZONE 'Africa/Johannesburg',
+					'YYYY-MM-DD"T"HH24:MI:SS"+02:00"') AS "endTimeLocal",
 					-- Availability check
 					CASE
 						-- If slot start time in local SA time is in the past or now → unavailable
-						WHEN (s.start_time AT TIME ZONE 'Africa/Johannesburg')
-							<= (NOW() AT TIME ZONE 'Africa/Johannesburg')
-							THEN false
-
+						WHEN ( s.start_time AT TIME ZONE 'Africa/Johannesburg' ) <= (
+							Now() AT TIME ZONE 'Africa/Johannesburg' ) THEN false
 						-- If no booking exists → available
-						WHEN b.id IS NULL
-							THEN true
-
+						WHEN b.id IS NULL THEN true
 						-- Otherwise → booked (not available)
 						ELSE false
 					END AS "isAvailable"
-
 				FROM slots s
-				-- Join with bookings to see if the slot has a valid booking
-				LEFT JOIN bookings b
-				ON s.id = b.slot_id
-				AND b.status != 'CANCELLED' -- cancelled bookings don’t block a slot
-
-				-- Filter by branch (parameter $1)
+					-- Join with bookings to see if the slot has a valid booking
+					LEFT JOIN bookings b
+							ON s.id = b.slot_id
+								AND b.status != 'CANCELLED' -- cancelled bookings don’t block a slot
 				WHERE s.branch_id = $1
-
-				-- Filter by time range (parameters $2 = startOfDay, $3 = endOfDay)
-				AND s.start_time BETWEEN $2 AND $3
-
-				-- Always order by slot start time
+					-- Filter by time range (parameters $2 = startOfDay, $3 = endOfDay)
+					AND s.start_time BETWEEN $2 AND $3
 				ORDER BY s.start_time;
             `,
 			values: [branchId, startOfDay, endOfDay]
@@ -113,7 +90,6 @@ export async function getBranchSlots(branchId: string, date: DateSchema) {
 		return rows;
 
 	} catch (error) {
-		console.error(error);
 		handlePostgresError(error, getBranchSlots.name);
 	}
 };

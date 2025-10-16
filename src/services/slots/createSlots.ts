@@ -31,17 +31,10 @@ export type CreateSlotsInput = z.infer<typeof createSlotsSchema>;
  * - A transaction ensures that either all slots are created, or none
  *   (rollback on error).
  *
- * @param {CreateSlotsInput} slot - Input object containing slot generation parameters:
- *   - `dateFrom` {string} — Start date (YYYY-MM-DD).
- *   - `dateTo` {string} — End date (YYYY-MM-DD).
- *   - `slotMinutes` {number} — Length of each slot in minutes.
- *   - `workStart` {string} — Start of working hours (HH:mm format).
- *   - `workEnd` {string} — End of working hours (HH:mm format).
+ * @param {CreateSlotsInput} slot - Input object containing slot generation parameters
  *
  * @param {string} branchId - UUID of the branch for which slots are being created.
  *
- * @returns {Promise<{ created: number }>} - Resolves with an object containing:
- *   - `created` {number} — The number of slots successfully inserted.
  *
  * @throws {Error} If any error occurs during slot creation, the transaction is rolled back
  *   and the error is propagated.
@@ -56,6 +49,24 @@ export async function createSlots(slot: CreateSlotsInput, branchId: string) {
 	const values: any[] = [];
 	const placeholders: string[] = [];
 	let paramIndex = 1;
+
+	const { rows } = await dbConnectionPool.query({
+		name: 'validate_branch_id',
+		text: `
+			SELECT id
+			FROM branches
+			WHERE id=$1
+			`,
+		values: [branchId]
+	});
+
+	if (rows.length === 0) {
+
+		return {
+			error: 'BranchNotFound',
+			message: `No branch exists with the ID ${branchId}`
+		};
+	}
 
 	  // Loop through each day in range
 	for (let d = startDate; d.isBefore(endDate) || d.isSame(endDate, 'day'); d = d.add(1, 'day')) {
@@ -90,6 +101,7 @@ export async function createSlots(slot: CreateSlotsInput, branchId: string) {
 	const client = await dbConnectionPool.connect();
 
 	try {
+
 		await client.query('BEGIN');
 
 		const result = await client.query(query, values);

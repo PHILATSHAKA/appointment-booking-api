@@ -4,9 +4,8 @@ import { z } from 'zod';
 import { authenticatedFrameworkResponses } from '#framework/types.js';
 import { baseLogger } from '#utils/logger.js';
 import { basename } from 'path';
-import { getBookingByIdSchemaResponse } from '#services/bookings/getBooking.js';
 
-import { bookingsFilterSchema, getBookings } from '#services/bookings/getBookings.js';
+import { bookingsFilterSchema, getBookings, getBookingsSchemaResponse } from '#services/bookings/getBookings.js';
 
 const logger = baseLogger.child({ fileName: basename(import.meta.url), functionName: getBookingsRoute.name });
 
@@ -25,7 +24,7 @@ export default function getBookingsRoute(server: FastifyZodTypeProvider) {
 			querystring: bookingsFilterSchema,
 			response: {
 				...authenticatedFrameworkResponses,
-				200: getBookingByIdSchemaResponse.array(),
+				200: getBookingsSchemaResponse.array(),
 				204: z.void()
 			}
 		},

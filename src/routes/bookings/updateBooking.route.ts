@@ -4,8 +4,9 @@ import { baseLogger } from '#utils/logger.js';
 import { basename } from 'path';
 import { z } from 'zod';
 
-import { bookingStatus, updateBooking } from '#services/bookings/updateBooking.js';
 import { authenticatedFrameworkResponses } from '#framework/types.js';
+import { bookingStatus } from '#src/common/schemas/bookingStatus.schema.js';
+import { updateBooking } from '#services/bookings/updateBooking.js';
 
 const logger = baseLogger.child({ fileName: basename(import.meta.url), functionName: updateBookingRoute.name });
 
@@ -22,7 +23,7 @@ export default function updateBookingRoute(server: FastifyZodTypeProvider) {
 			description: 'Update a booking',
 			tags: ['Bookings'],
 			body: z.object({
-				status: z.enum(['CONFIRMED', 'CANCELLED'])
+				status: bookingStatus
 			}),
 			params: z.object({
 				bookingId: z.string().uuid()

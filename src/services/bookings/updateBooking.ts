@@ -1,8 +1,8 @@
+import { bookingStatus } from '#src/common/schemas/bookingStatus.schema.js';
 import { dbConnectionPool } from '#resources/infra/config.js';
 import { handlePostgresError } from '#errors/postgresError.js';
 import { z } from 'zod';
 
-export const bookingStatus = z.enum(['CONFIRMED', 'CANCELLED']);
 export const updateBookingSchema = z.object({
 	status: bookingStatus
 });
@@ -61,8 +61,7 @@ export async function updateBooking({ status }: UpdateBookingInput, bookingId: s
 
 		const booking = rows[0];
 
-		// Only allow transition from PENDING → CONFIRMED or CANCELLED
-		if (booking.status !== 'PENDING') {
+		if (booking.status !== 'CANCELLED') {
 			await client.query('ROLLBACK');
 			return {
 				bookingId: bookingId,

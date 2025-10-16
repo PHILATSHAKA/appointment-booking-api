@@ -35,6 +35,7 @@
 	"scripts": {
 		"clean": "rimraf dist",
 		"build": "npm run clean && tsc",
+		"dev": "tsx watch src/app.js",
 		"postbuild": "node tasks/buildCopyStaticContent.mjs",
 		"start": "node dist/src/app.js",
 		"lint": "eslint \"src/**/*.{js,ts,tsx}\"",
@@ -43,10 +44,7 @@
 		"api-contract": "npm run build && node tasks/generateApiContract.mjs",
 		"lib-check": "npx npm-check-updates --interactive --format group",
 		"prelocal-checks": "npm version patch --no-git-tag-version",
-		"local-checks": "npm install && npm run lint && npm run spell && npm run build && npm run api-contract",
-		"git-prune": "run-script-os",
-		"git-prune:win32": "powershell \"git fetch -p; git branch -vv | Select-String -Pattern \\\": gone]\\\" | % { $_.toString().Trim().Split(\\\" \\\")[0]} | % {git branch -d $_}\"",
-		"git-prune:default": "git fetch -p && for branch in $(git branch -vv | grep ': gone]' | awk '{print $1}'); do git branch -D $branch; done"
+		"local-checks": "npm install && npm run lint && npm run spell && npm run build && npm run api-contract"
 	},
 	"dependencies": {
 		"@fastify/autoload": "6.3.1",
@@ -78,8 +76,10 @@
 		"@types/jsonwebtoken": "9.0.10",
 		"@types/node": "24.5.2",
 		"@types/pg": "8.15.5",
+		"@types/supertest": "6.0.3",
 		"@typescript-eslint/eslint-plugin": "8.44.1",
 		"@typescript-eslint/parser": "8.44.1",
+		"@vitest/coverage-v8": "3.2.4",
 		"cspell": "9.2.1",
 		"dotenv": "17.2.2",
 		"eslint": "9.36.0",
@@ -88,7 +88,9 @@
 		"npm-check-updates": "18.3.0",
 		"rimraf": "6.0.1",
 		"run-script-os": "1.1.6",
+		"supertest": "7.1.4",
 		"typescript": "5.9.2",
+		"vitest": "3.2.4",
 		"yaml": "2.8.1"
 	}
 }

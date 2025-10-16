@@ -28,18 +28,28 @@ export default function createBranchesRoute(server: FastifyZodTypeProvider) {
 				...authenticatedFrameworkResponses,
 				201: z
 					.object({
-						branchId: z.string(),
-						name: z.string()
-					})
+						message: z.string()
+					}),
+				422: z.object({
+					error: z.string(),
+					message: z.string()
+				})
 			}
 		},
 
 		handler: async (request, reply) => {
 			try {
 
-				await createSlots(request.body, request.params.branchId);
+				const response = await createSlots(request.body, request.params.branchId);
 
-				return reply.status(201).send();
+				if ('error' in response && response.error === 'BranchNotFound') {
+					return reply.status(422).send(response);
+				}
+
+				return reply.status(201).send({
+					message: `Successfully created: ${response.created} slots.`
+				});
+
 			} catch (error) {
 				logger.error({ error: error });
 				return reply.status(500).send();
