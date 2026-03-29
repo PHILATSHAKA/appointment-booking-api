@@ -1,0 +1,45 @@
+{
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"editor.renderWhitespace": "boundary",
+	"editor.showFoldingControls": "always",
+	"breadcrumbs.enabled": true,
+	"editor.stickyScroll.enabled": true,
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+	"git.ignoreLimitWarning": true,
+	"cSpell.enabled": true,
+	"cSpell.ignorePaths": [
+		"package-lock.json",
+		"node_modules",
+		"vscode-extension",
+		".git/objects",
+		".vscode",
+		".vscode-insiders",
+		".eslintrc.json"
+	],
+	// Ensure eslint is enabled.
+	"eslint.enable": true,
+	// Always show the ESlint status bar item.
+	"eslint.alwaysShowStatus": true,
+	// Run linter on save.
+	"eslint.run": "onType",
+	"eslint.workingDirectories": [
+		{
+			"mode": "auto"
+		}
+	],
+	// Set eslint quick fix to add rule on the same line.
+	"eslint.codeAction.disableRuleComment": {
+		"enable": true,
+		"location": "sameLine"
+	},
+	// Turns auto fix on save on or off.
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit"
+	},
+	"editor.rulers": [
+		160
+	],
+	"typescript.tsdk": "node_modules\\typescript\\lib",
+}

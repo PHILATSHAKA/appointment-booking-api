@@ -1,0 +1,50 @@
+{
+	"version": "0.2",
+	"language": "en",
+	"ignorePaths": [
+		".vscode/**",
+		"node_modules/**",
+		"cspell.json",
+		"tsconfig.json",
+		"test",
+		"src/static",
+		".gitlab-ci.yaml",
+		"kubernetes"
+	],
+	"flagWords": [
+		"surname" // use lastName instead
+	],
+	"dictionaries": [
+		"lorem-ipsum"
+	],
+	"words": [
+		"Autoload",
+		"capitec",
+		"capitecbank",
+		"Fastify",
+		"formbody",
+		"GAUTENG",
+		"healthcheck",
+		"initdb",
+		"instana",
+		"isready",
+		"jwks",
+		"kafkajs",
+		"KWAZULU",
+		"Luhn",
+		"MPUMALANGA",
+		"nodemon",
+		"normalise",
+		"normalised",
+		"openapi",
+		"Phila",
+		"pino",
+		"postbuild",
+		"prelocal",
+		"servicename",
+		"serviceversion",
+		"timestamptz",
+		"Tshaka"
+	],
+	"enabled": true
+}

@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  # m backend API
+  app:
+    build: .
+    container_name: appointment-booking-api
+    ports:
+      - "${WEB_SERVER_PORT:-4000}:4000"
+    env_file:
+      - .env
+    volumes:
+      - .:/app # Mount source code for live edits
+      - /app/node_modules # Prevent overwriting node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  db:
+    image: postgres:16
+    container_name: appointment-booking-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-appointments}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./migrations/db/01_init.sql:/docker-entrypoint-initdb.d/init.sql # 👈 auto-bootstrap
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+volumes:
+  db-data:
